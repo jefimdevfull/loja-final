@@ -1,0 +1,11 @@
+{
+    "frete": {
+        "estado_padrao": 20.00,
+        "ceara": 10.00,
+        "gratis_acima_de": 500.00
+    },
+    "politica": {
+        "validade_cupom_dias": 30,
+        "top_n_produtos": 5
+    }
+}
