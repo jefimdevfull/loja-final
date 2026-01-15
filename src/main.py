@@ -6,13 +6,39 @@ from pedido import criar_pedido_do_carrinho, listar_pedidos, STATUS_PAGO
 from frete import Frete
 from pagamento import Pagamento
 
-# Função auxiliar para buscar produto (caso não tenha no seu produto.py)
-def buscar_produto_por_sku(sku):
-    produtos = listar_produtos()
-    for p in produtos:
-        if p.sku == sku:
-            return p
-    return None
+# --- Função de Relatórios (Requisito 9 do PDF) ---
+def exibir_relatorios():
+    pedidos = listar_pedidos()
+    if not pedidos:
+        print("\nNenhum pedido registrado para gerar relatórios.")
+        return
+
+    print("\n" + "="*30)
+    print("   RELATÓRIOS GERENCIAIS")
+    print("="*30)
+
+    # 1. Faturamento Total (Apenas pedidos PAGOS contam como receita real)
+    pedidos_pagos = [p for p in pedidos if p.status == STATUS_PAGO]
+    faturamento = sum(p.total_final for p in pedidos_pagos)
+    
+    # 2. Contagem por Status
+    contagem = {}
+    for p in pedidos:
+        contagem[p.status] = contagem.get(p.status, 0) + 1
+
+    # 3. Ticket Médio (Média de valor por venda paga)
+    ticket_medio = faturamento / len(pedidos_pagos) if pedidos_pagos else 0.0
+
+    print(f"💰 Faturamento Total (Pagos): R$ {faturamento:.2f}")
+    print(f"🎫 Ticket Médio: R$ {ticket_medio:.2f}")
+    print("\n📊 Pedidos por Status:")
+    for status, qtd in contagem.items():
+        percentual = (qtd / len(pedidos)) * 100
+        print(f"   - {status}: {qtd} ({percentual:.1f}%)")
+    print("="*30)
+    input("Pressione Enter para voltar...")
+
+# --- Funções do Menu e Fluxo ---
 
 def menu():
     print("\n" + "="*30)
@@ -22,7 +48,7 @@ def menu():
     print("2. Cadastrar Produto")
     print("3. Listar Produtos")
     print("4. Nova Venda (Carrinho & Pedido)")
-    print("5. Relatórios (Pedidos)")
+    print("5. Relatórios e Estatísticas")
     print("0. Sair")
     return input("Escolha uma opção: ")
 
@@ -64,12 +90,12 @@ def fluxo_nova_venda():
     try:
         pedido = criar_pedido_do_carrinho(cliente, carrinho)
         print(f"\nPedido #{pedido.id} criado com sucesso!")
-        print(f"Total Produtos: R$ {pedido.total_produtos:.2f}")
+        print(f"Subtotal Produtos: R$ {pedido.total_produtos:.2f}")
     except ValueError as e:
         print(f"Erro ao criar pedido: {e}")
         return
 
-    # 4. Calcular Frete
+    # 4. Calcular Frete (Lendo de settings.json via classe Frete)
     cep = input("\nDigite o CEP para entrega: ")
     uf = input("Digite a UF (ex: CE, SP): ")
     
@@ -77,11 +103,9 @@ def fluxo_nova_venda():
     valor_frete = frete_obj.calcular()
     
     # Atualiza o pedido com o valor do frete
-    # (Como não criamos um método específico, vamos atribuir direto e salvar)
     pedido.frete = valor_frete
-    # Re-salvar seria ideal aqui, mas para simplificar, vamos seguir para o pagamento.
     
-    print(f"Frete calculado: R$ {valor_frete:.2f} ({frete_obj.prazo} dias)")
+    print(f"Frete calculado ({uf}): R$ {valor_frete:.2f} ({frete_obj.prazo} dias)")
     print(f"TOTAL FINAL A PAGAR: R$ {pedido.total_final:.2f}")
 
     # 5. Pagamento
@@ -89,18 +113,16 @@ def fluxo_nova_venda():
     if confirmar.lower() == 's':
         tipo = input("Forma de pagamento (PIX, CREDITO, DEBITO, BOLETO): ")
         try:
-            # Simula que o cliente pagou o valor exato
             pgto = Pagamento(pedido, tipo, pedido.total_final)
             pgto.processar()
             
-            # Baixa no estoque (Requisito 4 do PDF - Atualizar estoque ao faturar)
-            # Para cada item do pedido, reduzimos do estoque real
+            # Baixa no estoque (Requisito 4 do PDF)
             for item in pedido.itens:
                 prod_real = buscar_produto_por_sku(item.sku)
                 if prod_real:
                     nova_qtd = prod_real.estoque - item.quantidade
                     atualizar_produto(prod_real.sku, {'estoque': nova_qtd})
-            print("Estoque atualizado com sucesso!")
+            print("Estoque atualizado e pagamento confirmado!")
             
         except ValueError as e:
             print(f"Pagamento falhou: {e}")
@@ -112,20 +134,16 @@ def main():
         opcao = menu()
         
         if opcao == '1':
-            cpf = input("CPF: ")
-            nome = input("Nome: ")
-            email = input("Email: ")
-            endereco = input("Endereço: ")
             try:
-                criar_cliente(cpf, nome, email, endereco)
+                criar_cliente(input("CPF: "), input("Nome: "), input("Email: "), input("Endereço: "))
             except ValueError as e:
                 print(f"Erro: {e}")
 
         elif opcao == '2':
-            sku = input("SKU: ")
-            nome = input("Nome: ")
-            cat = input("Categoria: ")
             try:
+                sku = input("SKU: ")
+                nome = input("Nome: ")
+                cat = input("Categoria: ")
                 preco = float(input("Preço: "))
                 estoque = int(input("Estoque Inicial: "))
                 criar_produto(sku, nome, cat, preco, estoque)
@@ -143,10 +161,7 @@ def main():
             fluxo_nova_venda()
 
         elif opcao == '5':
-            peds = listar_pedidos()
-            print("\n--- HISTÓRICO DE PEDIDOS ---")
-            for p in peds:
-                print(p)
+            exibir_relatorios()
 
         elif opcao == '0':
             print("Saindo do sistema...")
