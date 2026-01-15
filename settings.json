@@ -1,11 +1,16 @@
 {
     "frete": {
-        "estado_padrao": 20.00,
-        "ceara": 10.00,
-        "gratis_acima_de": 500.00
+        "padrao": {"preco": 60.00, "prazo": 15},
+        "tabela": {
+            "CE": {"preco": 15.00, "prazo": 3},
+            "PE": {"preco": 20.00, "prazo": 5},
+            "SP": {"preco": 45.00, "prazo": 10},
+            "RJ": {"preco": 45.00, "prazo": 10},
+            "BA": {"preco": 25.00, "prazo": 6}
+        }
     },
     "politica": {
-        "validade_cupom_dias": 30,
-        "top_n_produtos": 5
+        "cancelamento_horas": 24,
+        "validade_cupom_dias": 30
     }
 }
