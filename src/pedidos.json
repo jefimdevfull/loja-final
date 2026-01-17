@@ -1,0 +1,18 @@
+[
+    {
+        "id": 1,
+        "cliente_cpf": "07173906326",
+        "itens": [
+            {
+                "sku": "1",
+                "nome": "oculos",
+                "preco_unitario": 45.0,
+                "quantidade": 1
+            }
+        ],
+        "total_produtos": 45.0,
+        "frete": 0.0,
+        "status": "CRIADO",
+        "data_criacao": "2026-01-17 17:33:12"
+    }
+]

@@ -1,4 +1,7 @@
 import sys
+from typing import Optional
+
+# Imports das classes do sistema
 from produto import criar_produto, listar_produtos, buscar_produto_por_sku, atualizar_produto
 from cliente import criar_cliente, listar_clientes, buscar_cliente_por_cpf
 from carrinho import Carrinho
@@ -6,8 +9,11 @@ from pedido import criar_pedido_do_carrinho, listar_pedidos, STATUS_PAGO
 from frete import Frete
 from pagamento import Pagamento
 
+# Import das exceções para tratamento correto (Critério 1)
+from excecoes import LojaErro, EstoqueInsuficienteErro, PagamentoRecusadoErro
+
 # --- Função de Relatórios (Requisito 9 do PDF) ---
-def exibir_relatorios():
+def exibir_relatorios() -> None:
     pedidos = listar_pedidos()
     if not pedidos:
         print("\nNenhum pedido registrado para gerar relatórios.")
@@ -17,7 +23,7 @@ def exibir_relatorios():
     print("   RELATÓRIOS GERENCIAIS")
     print("="*30)
 
-    # 1. Faturamento Total (Apenas pedidos PAGOS contam como receita real)
+    # 1. Faturamento Total (Apenas pedidos PAGOS)
     pedidos_pagos = [p for p in pedidos if p.status == STATUS_PAGO]
     faturamento = sum(p.total_final for p in pedidos_pagos)
     
@@ -26,7 +32,7 @@ def exibir_relatorios():
     for p in pedidos:
         contagem[p.status] = contagem.get(p.status, 0) + 1
 
-    # 3. Ticket Médio (Média de valor por venda paga)
+    # 3. Ticket Médio
     ticket_medio = faturamento / len(pedidos_pagos) if pedidos_pagos else 0.0
 
     print(f"💰 Faturamento Total (Pagos): R$ {faturamento:.2f}")
@@ -40,7 +46,7 @@ def exibir_relatorios():
 
 # --- Funções do Menu e Fluxo ---
 
-def menu():
+def menu() -> str:
     print("\n" + "="*30)
     print("   SISTEMA DE LOJA VIRTUAL")
     print("="*30)
@@ -52,7 +58,7 @@ def menu():
     print("0. Sair")
     return input("Escolha uma opção: ")
 
-def fluxo_nova_venda():
+def fluxo_nova_venda() -> None:
     print("\n--- INICIANDO NOVA VENDA ---")
     
     # 1. Identificar o Cliente
@@ -77,10 +83,16 @@ def fluxo_nova_venda():
             continue
             
         try:
-            qtd = int(input(f"Quantidade de '{produto.nome}': "))
+            qtd_str = input(f"Quantidade de '{produto.nome}': ")
+            qtd = int(qtd_str)
             carrinho.adicionar_item(produto, qtd)
+            
+        except EstoqueInsuficienteErro as e:
+            print(f"❌ Erro de Estoque: {e}")
         except ValueError as e:
-            print(f"Erro ao adicionar: {e}")
+            print(f"❌ Erro de Valor: {e}")
+        except Exception as e:
+            print(f"❌ Erro inesperado: {e}")
 
     if len(carrinho) == 0:
         print("Carrinho vazio. Venda cancelada.")
@@ -95,14 +107,13 @@ def fluxo_nova_venda():
         print(f"Erro ao criar pedido: {e}")
         return
 
-    # 4. Calcular Frete (Lendo de settings.json via classe Frete)
+    # 4. Calcular Frete
     cep = input("\nDigite o CEP para entrega: ")
     uf = input("Digite a UF (ex: CE, SP): ")
     
     frete_obj = Frete(cep, uf)
     valor_frete = frete_obj.calcular()
     
-    # Atualiza o pedido com o valor do frete
     pedido.frete = valor_frete
     
     print(f"Frete calculado ({uf}): R$ {valor_frete:.2f} ({frete_obj.prazo} dias)")
@@ -116,20 +127,23 @@ def fluxo_nova_venda():
             pgto = Pagamento(pedido, tipo, pedido.total_final)
             pgto.processar()
             
-            # Baixa no estoque (Requisito 4 do PDF)
+            # Baixa no estoque
             for item in pedido.itens:
                 prod_real = buscar_produto_por_sku(item.sku)
                 if prod_real:
                     nova_qtd = prod_real.estoque - item.quantidade
                     atualizar_produto(prod_real.sku, {'estoque': nova_qtd})
-            print("Estoque atualizado e pagamento confirmado!")
             
+            print("✅ Estoque atualizado e pagamento confirmado!")
+            
+        except PagamentoRecusadoErro as e:
+            print(f"❌ Pagamento Recusado: {e}")
         except ValueError as e:
-            print(f"Pagamento falhou: {e}")
+            print(f"❌ Erro nos dados: {e}")
     else:
         print("Pedido salvo como 'CRIADO'. Aguardando pagamento futuro.")
 
-def main():
+def main() -> None:
     while True:
         opcao = menu()
         

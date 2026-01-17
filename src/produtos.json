@@ -1,0 +1,10 @@
+[
+    {
+        "sku": "1",
+        "nome": "oculos",
+        "categoria": "acessorio",
+        "preco": 45.0,
+        "estoque": 4,
+        "ativo": true
+    }
+]
