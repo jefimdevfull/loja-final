@@ -1,103 +1,226 @@
-Markdown
+# 🛒 Sistema de Loja Virtual (CLI) — v1.0
 
-# 🛒 Sistema de Loja Virtual (CLI) - v1.0
+Projeto final da disciplina de **Programação Orientada a Objetos (POO)**.
 
-Projeto final da disciplina de Programação Orientada a Objetos (POO).
-O software simula as operações essenciais de um e-commerce via terminal, aplicando conceitos de Orientação a Objetos, persistência de dados em arquivos e regras de negócio configuráveis.
+O sistema simula as principais operações de um **e-commerce via terminal (CLI)**, aplicando conceitos fundamentais de **Orientação a Objetos**, **persistência de dados em arquivos JSON** e **regras de negócio configuráveis**.
 
 ---
 
 ## 🚀 Guia de Instalação e Execução
 
-**Pré-requisitos:** Python 3.8 ou superior.
+### ✅ Pré-requisitos
 
-1. **Clone o repositório:**
-   ```bash
-   git clone [https://github.com/jefimdevfull/loja-final.git](https://github.com/jefimdevfull/loja-final.git)
-Acesse a pasta do projeto:
+* Python **3.8 ou superior**
 
-Bash
+---
 
+### 📥 Clonando o repositório
+
+```bash
+git clone https://github.com/jefimdevfull/loja-final.git
+```
+
+---
+
+### 📂 Acessando o projeto
+
+```bash
 cd loja-final
-Execute o sistema: ⚠️ Importante: Navegue até a pasta src antes de rodar o arquivo principal para que as configurações sejam carregadas corretamente.
+```
 
-Bash
+---
 
+### ▶️ Executando o sistema
+
+⚠️ **Importante:** navegue até a pasta `src` antes de executar o programa, pois os arquivos de configuração são carregados a partir dela.
+
+```bash
 cd src
 python main.py
-📂 Arquitetura e Estrutura
-O projeto foi organizado em módulos para garantir alta coesão e baixo acoplamento.
+```
 
-Plaintext
+---
 
+## 🧱 Arquitetura e Estrutura do Projeto
+
+O sistema foi organizado em módulos para garantir **alta coesão**, **baixo acoplamento** e **manutenibilidade**.
+
+```
 loja-final/
 │
-├── src/                  # Código Fonte
-│   ├── main.py           # View/Controller (Menu, Fluxos e Relatórios)
-│   ├── produto.py        # Model (Regras de Produto e Estoque)
-│   ├── cliente.py        # Model (Dados de Cliente e Validações)
-│   ├── carrinho.py       # Lógica de Negócio (Composição de Itens)
-│   ├── pedido.py         # Model (Processamento de Venda e Status)
-│   ├── pagamento.py      # Serviço (Validação Financeira)
-│   ├── frete.py          # Serviço (Cálculo Logístico via JSON)
-│   ├── excecoes.py       # Tratamento de Erros Personalizados
-│   ├── dados.py          # Persistência (Leitura/Escrita em JSON)
-│   └── settings.json     # Configurações Externas (Tabela de Frete)
+├── src/                      # Código-fonte
+│   ├── main.py               # Controller / View (menus e fluxos)
+│   ├── produto.py            # Model: produtos e estoque
+│   ├── cliente.py            # Model: clientes e validações
+│   ├── carrinho.py           # Regra de negócio do carrinho
+│   ├── pedido.py             # Model: pedidos e status
+│   ├── pagamento.py          # Serviço: validação financeira
+│   ├── frete.py              # Serviço: cálculo de frete via JSON
+│   ├── excecoes.py           # Exceções personalizadas
+│   ├── dados.py               # Persistência em arquivos JSON
+│   └── settings.json         # Configurações externas (frete)
 │
-└── README.md             # Documentação do Projeto
-🏆 Destaques Técnicos (Critérios de Avaliação)
-Para atender aos requisitos de excelência, o sistema implementa:
+└── README.md                 # Documentação do projeto
+```
 
-Modelagem OO Robusta: Uso de Herança, Encapsulamento (@property), Polimorfismo e Composição.
+---
 
-Qualidade de Código (Type Hints): Tipagem estática em métodos críticos (ex: def calcular(self) -> float:) para maior segurança e legibilidade.
+## 🏆 Destaques Técnicos
 
-Tratamento de Erros Semântico: Implementação de Exceções Customizadas (EstoqueInsuficienteErro, PagamentoRecusadoErro, LojaErro) em vez de erros genéricos.
+O projeto atende aos critérios de avaliação por meio dos seguintes recursos:
 
-Configuração Externa: As regras de frete (preços e prazos por estado) são lidas dinamicamente do arquivo settings.json, permitindo alterações sem mexer no código.
+### 🔹 Modelagem Orientada a Objetos
 
-Persistência: Dados de Clientes, Produtos e Pedidos são persistidos automaticamente em JSON.
+* Herança
+* Encapsulamento (`@property`)
+* Polimorfismo
+* Composição entre classes
 
-✅ Funcionalidades do Sistema
-Cadastros (CRUD):
+---
 
-Gestão de Clientes com validação de CPF e unicidade.
+### 🔹 Qualidade de Código
 
-Gestão de Produtos com controle de estoque e status ativo/inativo.
+* Uso de **Type Hints** em métodos críticos
 
-Vendas:
+Exemplo:
 
-Carrinho de compras dinâmico.
+```python
+def calcular_total(self) -> float:
+```
 
-Verificação de disponibilidade de estoque em tempo real.
+---
 
-Financeiro e Logística:
+### 🔹 Tratamento de Erros Semântico
 
-Cálculo de frete parametrizado por UF.
+Implementação de exceções personalizadas, como:
 
-Pagamento com baixa automática no estoque.
+* `EstoqueInsuficienteErro`
+* `PagamentoRecusadoErro`
+* `LojaErro`
 
-Relatórios Gerenciais:
+Evita o uso de exceções genéricas e melhora a legibilidade do código.
 
-Monitoramento de Faturamento.
+---
 
-Cálculo de Ticket Médio.
+### 🔹 Configuração Externa
 
-Análise de Pedidos por Status.
+As regras de frete são carregadas dinamicamente a partir do arquivo:
 
-👥 Equipe e Atribuições
-CICERO ANDREILSON SANTOS MENESES
+```
+settings.json
+```
 
-Responsabilidade: Modelagem e implementação das classes relacionadas a Produtos e Estoque, incluindo CRUD de produtos, validações de atributos (preço, estoque, SKU) e métodos especiais. Atuará também no apoio à persistência de dados.
+Permitindo:
 
-CICERO JEFERSON SANTOS DE ARAÚJO
+* Alterar valores
+* Ajustar prazos
+* Incluir novos estados
 
-Responsabilidade: Estrutura geral do projeto e implementação das classes de Cliente e Endereço, com validações de email, CPF e unicidade. Responsável pela organização do repositório GitHub e documentação inicial.
+Sem necessidade de modificar o código-fonte.
 
-JOSLEY VINICIUS BASTOS DA SILVA
+---
 
-Responsabilidade: Desenvolvimento das classes relacionadas ao Carrinho de Compras e Itens do Carrinho, incluindo regras de negócio para adição/remoção de itens e cálculo de subtotal.
+### 🔹 Persistência de Dados
 
-LIVIA MARIA DE OLIVEIRA FERREIRA
+Os dados são armazenados automaticamente em arquivos JSON:
 
-Responsabilidade: Implementação das classes de Pedido e Pagamento, contemplando estados do pedido, cálculo de total, aplicação de frete e registro de pagamentos.
+* Clientes
+* Produtos
+* Pedidos
+
+Garantindo persistência entre execuções do sistema.
+
+---
+
+## ✅ Funcionalidades do Sistema
+
+### 📋 Cadastros (CRUD)
+
+* Cadastro de clientes com:
+
+  * Validação de CPF
+  * Validação de e-mail
+  * Controle de unicidade
+
+* Cadastro de produtos com:
+
+  * Controle de estoque
+  * Validação de preço
+  * Status ativo/inativo
+
+---
+
+### 🛒 Vendas
+
+* Carrinho de compras dinâmico
+* Adição e remoção de itens
+* Cálculo automático de subtotal
+* Verificação de estoque em tempo real
+
+---
+
+### 💳 Financeiro e Logística
+
+* Cálculo de frete por UF
+* Regras baseadas em configuração externa
+* Processamento de pagamento
+* Baixa automática no estoque
+
+---
+
+### 📊 Relatórios Gerenciais
+
+* Faturamento total
+* Ticket médio
+* Análise de pedidos por status
+
+---
+
+## 👥 Equipe e Atribuições
+
+### 👤 **Cícero Andreilson Santos Meneses**
+
+**Responsabilidades:**
+
+* Modelagem e implementação das classes de **Produto** e **Estoque**
+* CRUD de produtos
+* Validações de preço, estoque e SKU
+* Apoio à persistência de dados
+
+---
+
+### 👤 **Cícero Jeferson Santos de Araújo**
+
+**Responsabilidades:**
+
+* Estrutura geral do projeto
+* Implementação das classes de **Cliente** e **Endereço**
+* Validações de CPF e e-mail
+* Organização do repositório GitHub
+* Documentação do sistema
+
+---
+
+### 👤 **Josley Vinícius Bastos da Silva**
+
+**Responsabilidades:**
+
+* Desenvolvimento do **Carrinho de Compras**
+* Gerenciamento de itens
+* Regras de adição, remoção e cálculo de subtotal
+
+---
+
+### 👤 **Lívia Maria de Oliveira Ferreira**
+
+**Responsabilidades:**
+
+* Implementação das classes de **Pedido** e **Pagamento**
+* Controle de status do pedido
+* Cálculo do valor total
+* Aplicação de frete
+* Registro de pagamentos
+
+---
+
+📌 **Projeto acadêmico desenvolvido para fins educacionais.**
