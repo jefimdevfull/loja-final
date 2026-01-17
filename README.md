@@ -13,12 +13,15 @@ O software simula as operações essenciais de um e-commerce via terminal, aplic
 
 1. **Clone o repositório:**
    ```bash
-   git clone https://github.com/jefimdevfull/loja-final.git
+   git clone [https://github.com/jefimdevfull/loja-final.git](https://github.com/jefimdevfull/loja-final.git)
 Acesse a pasta do projeto:
+
+Bash
 
 cd loja-final
 Execute o sistema: ⚠️ Importante: Navegue até a pasta src antes de rodar o arquivo principal para que as configurações sejam carregadas corretamente.
 
+Bash
 
 cd src
 python main.py
